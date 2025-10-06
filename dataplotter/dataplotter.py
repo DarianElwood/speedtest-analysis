@@ -104,29 +104,19 @@ class DataPlotter:
         """
         
         for result in self.data:
-            # allow either ordering of the requested data types
-            types_set = set(data_types)
-            if types_set == {"ping", "download"}:
-                if data_types[0] == "ping":
+            data_types = type_checker(data_types)
+            match data_types:
+                case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
                         return result.server
-                else:
-                    if result.download == x_value and result.ping == y_value:
-                        return result.server
-            elif types_set == {"ping", "upload"}:
-                if data_types[0] == "ping":
+                case ("ping", "upload"):
                     if result.ping == x_value and result.upload == y_value:
                         return result.server
-                else:
-                    if result.upload == x_value and result.ping == y_value:
-                        return result.server
-            elif types_set == {"download", "upload"}:
-                if data_types[0] == "download":
+                case ("download", "upload"):
                     if result.download == x_value and result.upload == y_value:
                         return result.server
-                else:
-                    if result.upload == x_value and result.download == y_value:
-                        return result.server
+                case _:
+                    raise ValueError("Invalid data type combination.")
         return None
     
     def get_datapoint_upload(self, x_value: float, y_value: float, data_types: tuple[str, str]) -> Union[float, None]:
@@ -143,29 +133,19 @@ class DataPlotter:
         """
         
         for result in self.data:
-            types_set = set(data_types)
-            if types_set == {"ping", "download"}:
-                # upload is the unused value in this pair
-                if data_types[0] == "ping":
+            data_types = type_checker(data_types)
+            match data_types:
+                case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
                         return result.upload
-                else:
-                    if result.download == x_value and result.ping == y_value:
-                        return result.upload
-            elif types_set == {"ping", "upload"}:
-                if data_types[0] == "ping":
+                case ("ping", "upload"):
                     if result.ping == x_value and result.upload == y_value:
                         return result.upload
-                else:
-                    if result.upload == x_value and result.ping == y_value:
-                        return result.upload
-            elif types_set == {"download", "upload"}:
-                if data_types[0] == "download":
+                case ("download", "upload"):
                     if result.download == x_value and result.upload == y_value:
                         return result.upload
-                else:
-                    if result.upload == x_value and result.download == y_value:
-                        return result.upload
+                case _:
+                    raise ValueError("Invalid data type combination.")
         return None
     
     def get_datapoint_download(self, x_value: float, y_value: float, data_types: tuple[str, str]) -> Union[float, None]:
@@ -181,29 +161,19 @@ class DataPlotter:
         """
         
         for result in self.data:
-            types_set = set(data_types)
-            if types_set == {"ping", "download"}:
-                if data_types[0] == "ping":
+            data_types = type_checker(data_types)
+            match data_types:
+                case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
                         return result.download
-                else:
-                    if result.download == x_value and result.ping == y_value:
-                        return result.download
-            elif types_set == {"ping", "upload"}:
-                # download is the unused value for (ping, upload)
-                if data_types[0] == "ping":
+                case ("ping", "upload"):
                     if result.ping == x_value and result.upload == y_value:
                         return result.download
-                else:
-                    if result.upload == x_value and result.ping == y_value:
-                        return result.download
-            elif types_set == {"download", "upload"}:
-                if data_types[0] == "download":
+                case ("download", "upload"):
                     if result.download == x_value and result.upload == y_value:
                         return result.download
-                else:
-                    if result.upload == x_value and result.download == y_value:
-                        return result.download
+                case _:
+                    raise ValueError("Invalid data type combination.")
         return None
 
     def get_datapoint_device(self,
@@ -222,28 +192,19 @@ class DataPlotter:
         """
         
         for result in self.data:
-            types_set = set(data_types)
-            if types_set == {"ping", "download"}:
-                if data_types[0] == "ping":
+            data_types = type_checker(data_types)
+            match data_types:
+                case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
                         return result.device
-                else:
-                    if result.download == x_value and result.ping == y_value:
-                        return result.device
-            elif types_set == {"ping", "upload"}:
-                if data_types[0] == "ping":
+                case ("ping", "upload"):
                     if result.ping == x_value and result.upload == y_value:
                         return result.device
-                else:
-                    if result.upload == x_value and result.ping == y_value:
-                        return result.device
-            elif types_set == {"download", "upload"}:
-                if data_types[0] == "download":
+                case ("download", "upload"):
                     if result.download == x_value and result.upload == y_value:
                         return result.device
-                else:
-                    if result.upload == x_value and result.download == y_value:
-                        return result.device
+                case _:
+                    raise ValueError("Invalid data type combination.")
         return None
     
     def get_datapoint_ping(self, x_value: float, y_value: float, data_types: tuple[str, str]) -> Union[float, None]:
@@ -258,28 +219,19 @@ class DataPlotter:
         """
         
         for result in self.data:
-            types_set = set(data_types)
-            if types_set == {"ping", "download"}:
-                if data_types[0] == "ping":
+            data_types = type_checker(data_types)
+            match data_types:
+                case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
                         return result.ping
-                else:
-                    if result.download == x_value and result.ping == y_value:
-                        return result.ping
-            elif types_set == {"ping", "upload"}:
-                if data_types[0] == "ping":
+                case ("ping", "upload"):
                     if result.ping == x_value and result.upload == y_value:
                         return result.ping
-                else:
-                    if result.upload == x_value and result.ping == y_value:
-                        return result.ping
-            elif types_set == {"download", "upload"}:
-                if data_types[0] == "download":
+                case ("download", "upload"):
                     if result.download == x_value and result.upload == y_value:
                         return result.ping
-                else:
-                    if result.upload == x_value and result.download == y_value:
-                        return result.ping
+                case _:
+                    raise ValueError("Invalid data type combination.")
         return None
     
     def extract_data(self, data_type: tuple[str, str]) -> tuple[
@@ -311,40 +263,41 @@ class DataPlotter:
         
         if data_type[0] not in allowed or data_type[1] not in allowed:
             raise ValueError(f"Data types must be one of {allowed}")
-        
+    
         # allow either ordering: use the requested order to map x/y
-        types_set = set(data_type)
-        if types_set == {"ping", "download"}:
-            if data_type[0] == "ping":
+        data_type = type_checker(data_type)
+        match data_type:
+            case ("ping", "download"):
                 x_data = [result.ping for result in self.data]
                 y_data = [result.download for result in self.data]
                 x_label, y_label = "Ping (ms)", "Download (Mbps)"
-            else:
-                x_data = [result.download for result in self.data]
-                y_data = [result.ping for result in self.data]
-                x_label, y_label = "Download (Mbps)", "Ping (ms)"
-            self.unused_case = "upload"
-        elif types_set == {"ping", "upload"}:
-            if data_type[0] == "ping":
+                self.unused_case = "upload"
+            case ("ping", "upload"):
                 x_data = [result.ping for result in self.data]
                 y_data = [result.upload for result in self.data]
                 x_label, y_label = "Ping (ms)", "Upload (Mbps)"
-            else:
-                x_data = [result.upload for result in self.data]
-                y_data = [result.ping for result in self.data]
-                x_label, y_label = "Upload (Mbps)", "Ping (ms)"
-            self.unused_case = "download"
-        elif types_set == {"download", "upload"}:
-            if data_type[0] == "download":
+                self.unused_case = "download"
+            case ("download", "upload"):
                 x_data = [result.download for result in self.data]
                 y_data = [result.upload for result in self.data]
                 x_label, y_label = "Download (Mbps)", "Upload (Mbps)"
-            else:
-                x_data = [result.upload for result in self.data]
-                y_data = [result.download for result in self.data]
-                x_label, y_label = "Upload (Mbps)", "Download (Mbps)"
-            self.unused_case = "ping"
-        else:
-            raise ValueError("Invalid data type combination.")
-        
+                self.unused_case = "ping"
+            case _:
+                raise ValueError("Invalid data type combination.")
         return (x_data, y_data, x_label, y_label, self.unused_case)
+    
+def type_checker(types: tuple[str, str]) -> tuple[str, str]:
+    """Ensures that the provided types are valid and in the 
+    correct order."""
+    
+    if len(types) != 2:
+        raise ValueError("Exactly two data types must be provided.")
+    
+    if "download" in types and "upload" in types:
+        return ("download", "upload")
+    elif "ping" in types and "download" in types:
+        return ("ping", "download")
+    elif "ping" in types and "upload" in types:
+        return ("ping", "upload")
+    else:
+        raise ValueError("Invalid data type combination.")
