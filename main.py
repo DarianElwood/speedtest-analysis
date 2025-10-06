@@ -5,7 +5,10 @@ import sys
 
 
 
-def main():
+def main() -> None:
+    """Main function to read data and plot based upon command-line 
+    arguments."""
+    
     data = read_data()
     plotter = DataPlotter(data)
     match sys.argv:
@@ -18,6 +21,13 @@ def main():
     
 
 def read_data() -> list[SpeedTestResult]:
+    """Reads speed test data from an Excel file and returns a list of 
+    SpeedTestResult objects.
+    
+    Returns:
+        list[SpeedTestResult]: List of speed test results.
+    """
+    
     data = pd.read_excel('speeds.xlsx')
     data_list = []
     for index, row in data.iterrows():
@@ -25,7 +35,8 @@ def read_data() -> list[SpeedTestResult]:
             server=row['Server'],
             ping=row['Ping'],
             download=row['Download'],
-            upload=row['Upload']
+            upload=row['Upload'],
+            device=row['Device'],
         )
         data_list.append(result)
     return data_list
