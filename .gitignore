@@ -219,5 +219,5 @@ __marimo__/
 $speeds.xlsx
 $~speeds.xlsx
 speeds.xlsx
-dataplotter/__pycache__/
-speedtest_result/__pycache__/
+dataplotter/__pycache__/*
+speedtest_result/__pycache__/*
