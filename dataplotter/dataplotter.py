@@ -27,6 +27,7 @@ class DataPlotter:
             no data to plot 
         """
         
+        unused_case = ""
         if not self.data:
             print("No data to plot.")
             return
@@ -40,14 +41,18 @@ class DataPlotter:
                 x_data = [result.ping for result in self.data]
                 y_data = [result.download for result in self.data]
                 x_label, y_label = "Ping (ms)", "Download (Mbps)"
+                self.unused_case = "upload"
             case ("ping", "upload"):
                 x_data = [result.ping for result in self.data]
                 y_data = [result.upload for result in self.data]
                 x_label, y_label = "Ping (ms)", "Upload (Mbps)"
+                self.unused_case = "download"
             case ("download", "upload"):
                 x_data = [result.download for result in self.data]
                 y_data = [result.upload for result in self.data]
                 x_label, y_label = "Download (Mbps)", "Upload (Mbps)"
+                self.unused_case = "ping"
+                
             case _:
                 raise ValueError("Invalid data type combination.")
         
@@ -70,6 +75,7 @@ class DataPlotter:
                 sel.annotation.set(text=f"Server: {server_info}\n"
                                         f"{x_label}: {x:.2f}\n"
                                         f"{y_label}: {y:.2f}")
+                                    
             else:
                 sel.annotation.set(text=f"{x_label}: {x:.2f}\n"
                                         f"{y_label}: {y:.2f}")
@@ -94,3 +100,36 @@ class DataPlotter:
                         return result.server
         return None
     
+    def get_datapoint_upload(self, x_value: float, y_value: float, data_types: tuple[str, str]) -> Union[float, None]:
+        """Returns the upload speed for a given datapoint.
+        """
+        
+        for result in self.data:
+            match data_types:
+                case ("ping", "download"):
+                    if result.ping == x_value and result.download == y_value:
+                        return result.upload
+                case ("ping", "upload"):
+                    if result.ping == x_value and result.upload == y_value:
+                        return result.upload
+                case ("download", "upload"):
+                    if result.download == x_value and result.upload == y_value:
+                        return result.upload
+        return None
+    
+    def get_datapoint_download(self, x_value: float, y_value: float, data_types: tuple[str, str]) -> Union[float, None]:
+        """Returns the download speed for a given datapoint.
+        """
+        
+        for result in self.data:
+            match data_types:
+                case ("ping", "download"):
+                    if result.ping == x_value and result.download == y_value:
+                        return result.download
+                case ("ping", "upload"):
+                    if result.ping == x_value and result.upload == y_value:
+                        return result.download
+                case ("download", "upload"):
+                    if result.download == x_value and result.upload == y_value:
+                        return result.download
+        return None
