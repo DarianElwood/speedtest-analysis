@@ -61,38 +61,32 @@ class DataPlotter:
             device_info = self.get_datapoint_device(x, y, data_types)
             
             if server_info is None:
-                sel.annotation.set(text=f"{x_label}: {x:.2f}\n"
-                                        f"{y_label}: {y:.2f}")
+                raise ValueError("Server information not found for the selected" 
+                                 "datapoint.")
+            
+            if device_info is None:
+                raise ValueError("Device information not found for the selected"
+                                 "datapoint.")
                 
             else: 
-                if self.unused_case == "upload":
-                    upload = self.get_datapoint_upload(x, y, data_types)
-                    sel.annotation.set(text=f"Server: {server_info}\n"
-                                            f"{x_label}: {x:.2f}\n"
-                                            f"{y_label}: {y:.2f}"
-                                            f"\nUpload (mbps): {upload:.2f}"
-                                            f"\nDevice: {device_info}")
-                elif self.unused_case == "download":
-                    download = self.get_datapoint_download(x, y, data_types)
-                    sel.annotation.set(text=f"Server: {server_info}\n"
-                                            f"{x_label}: {x:.2f}\n"
-                                            f"{y_label}: {y:.2f}"
-                                            f"\nDownload (mbps): {download:.2f}"
-                                            f"\nDevice: {device_info}")
-                elif self.unused_case == "ping":
-                    ping = self.get_datapoint_ping(x, y, data_types)
-                    sel.annotation.set(text=f"Server: {server_info}\n"
-                                            f"{x_label}: {x:.2f}\n"
-                                            f"{y_label}: {y:.2f}\n"
-                                            f"Ping (ms): {ping:.2f}"
-                                            f"\nDevice: {device_info}")                   
+                string = self.create_datapoint_annotation_string(x, y,
+                                                                 x_label,
+                                                                 y_label,
+                                                                 device_info,
+                                                                 server_info)
+                sel.annotation.set(text=string)
+                sel.annotation.get_bbox_patch().set(fc="white", alpha=0.8)
+                sel.annotation.arrow_patch.set(arrowstyle="simple",
+                                               fc="white",
+                                               alpha=0.8)                
         plt.grid()
         plt.show()
         
     def get_datapoint_serverinfo(self, 
                                  x_value: float,
                                  y_value: float,
-                                 data_types: tuple[str, str]) -> Union[str, None]:
+                                 data_types: tuple[str, str]) -> Union[str,
+                                                                       None]:
         """Returns the server location information for a given
         datapoint.
         Args:
@@ -104,7 +98,7 @@ class DataPlotter:
         """
         
         for result in self.data:
-            data_types = type_checker(data_types)
+            data_types = self.type_checker(data_types)
             match data_types:
                 case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
@@ -119,7 +113,11 @@ class DataPlotter:
                     raise ValueError("Invalid data type combination.")
         return None
     
-    def get_datapoint_upload(self, x_value: float, y_value: float, data_types: tuple[str, str]) -> Union[float, None]:
+    def get_datapoint_upload(self,
+                             x_value: float,
+                             y_value: float,
+                             data_types: tuple[str, str]) -> Union[float,
+                                                                   None]:
         """Returns the upload speed for a given datapoint.
         If result not found, returns None.
         
@@ -133,7 +131,7 @@ class DataPlotter:
         """
         
         for result in self.data:
-            data_types = type_checker(data_types)
+            data_types = self.type_checker(data_types)
             match data_types:
                 case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
@@ -148,7 +146,11 @@ class DataPlotter:
                     raise ValueError("Invalid data type combination.")
         return None
     
-    def get_datapoint_download(self, x_value: float, y_value: float, data_types: tuple[str, str]) -> Union[float, None]:
+    def get_datapoint_download(self,
+                               x_value: float,
+                               y_value: float,
+                               data_types: tuple[str, str]) -> Union[float,
+                                                                     None]:
         """Returns the download speed for a given datapoint.
         If result not found, returns None.
         
@@ -161,7 +163,7 @@ class DataPlotter:
         """
         
         for result in self.data:
-            data_types = type_checker(data_types)
+            data_types = self.type_checker(data_types)
             match data_types:
                 case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
@@ -192,7 +194,7 @@ class DataPlotter:
         """
         
         for result in self.data:
-            data_types = type_checker(data_types)
+            data_types = self.type_checker(data_types)
             match data_types:
                 case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
@@ -207,7 +209,11 @@ class DataPlotter:
                     raise ValueError("Invalid data type combination.")
         return None
     
-    def get_datapoint_ping(self, x_value: float, y_value: float, data_types: tuple[str, str]) -> Union[float, None]:
+    def get_datapoint_ping(self,
+                           x_value: float,
+                           y_value: float,
+                           data_types: tuple[str, str]) -> Union[float,
+                                                                 None]:
         """Returns the ping for a given datapoint.
         
         Args:
@@ -219,7 +225,7 @@ class DataPlotter:
         """
         
         for result in self.data:
-            data_types = type_checker(data_types)
+            data_types = self.type_checker(data_types)
             match data_types:
                 case ("ping", "download"):
                     if result.ping == x_value and result.download == y_value:
@@ -263,9 +269,8 @@ class DataPlotter:
         
         if data_type[0] not in allowed or data_type[1] not in allowed:
             raise ValueError(f"Data types must be one of {allowed}")
-    
-        # allow either ordering: use the requested order to map x/y
-        data_type = type_checker(data_type)
+        
+        data_type = self.type_checker(data_type)
         match data_type:
             case ("ping", "download"):
                 x_data = [result.ping for result in self.data]
@@ -286,18 +291,81 @@ class DataPlotter:
                 raise ValueError("Invalid data type combination.")
         return (x_data, y_data, x_label, y_label, self.unused_case)
     
-def type_checker(types: tuple[str, str]) -> tuple[str, str]:
-    """Ensures that the provided types are valid and in the 
-    correct order."""
+    def create_datapoint_annotation_string(self,
+                                           x: float,
+                                           y: float,
+                                           x_label: str,
+                                           y_label: str,
+                                           device_info: str,
+                                           server_info: str ) -> str:
+        """Creates a standardized annotation string for datapoints.
+        Args: 
+            x (float): The x-coordinate value of the datapoint.
+            y (float): The y-coordinate value of the datapoint.
+            x_label (str): The label for the x-axis.
+            y_label (str): The label for the y-axis.
+            device_info (str): The device information associated with 
+            the datapoint.
+            server_info (str): The server information associated with 
+            the datapoint.
+        Returns:
+            str: A formatted annotation string.
+        """
+        string = ""
+        data_type = ()
+        
+        # Generates a string based on the unused data type
+        match self.unused_case:
+            case "upload":
+                data_type = ("ping", "download")
+                data_type = self.type_checker(data_type)
+                upload = self.get_datapoint_upload(x, y, data_type)
+                string = (f"Server: {server_info}\n"
+                         f"{x_label}: {x}\n"
+                         f"{y_label}: {y:.2f}\n"
+                         f"Upload (mbps): {upload}\n"
+                         f"Device: {device_info}")
+            case "download":
+                data_type = ("ping", "upload")
+                data_type = self.type_checker(data_type)
+                download = self.get_datapoint_download(x, y, data_type)
+                string = (f"Server: {server_info}\n"
+                         f"{x_label}: {x}\n"
+                         f"{y_label}: {y:.2f}\n"
+                         f"Download (mbps): {download}\n"
+                         f"Device: {device_info}")
+            case "ping":
+                data_type = ("download", "upload")
+                data_type = self.type_checker(data_type)
+                ping = self.get_datapoint_ping(x, y, data_type)
+                string = (f"Server: {server_info}\n"
+                         f"{x_label}: {x:.2f}\n"
+                         f"{y_label}: {y:.2f}\n"
+                         f"Ping (ms): {ping}\n"
+                         f"Device: {device_info}")
+            case _:
+                raise ValueError("Invalid unused data type.")
+        return string
     
-    if len(types) != 2:
-        raise ValueError("Exactly two data types must be provided.")
+    @staticmethod
+    def type_checker(types: tuple[str, str]) -> tuple[str, str]:
+        """Ensures that the provided types are valid and in the 
+        correct order.
+        Args:
+            types (tuple[str, str]): A tuple of two data types.
+        Returns:
+            tuple[str, str]: The validated and ordered tuple of data types.
+        """
     
-    if "download" in types and "upload" in types:
-        return ("download", "upload")
-    elif "ping" in types and "download" in types:
-        return ("ping", "download")
-    elif "ping" in types and "upload" in types:
-        return ("ping", "upload")
-    else:
-        raise ValueError("Invalid data type combination.")
+        if len(types) != 2:
+            raise ValueError("Exactly two data types must be provided.")
+    
+        if "download" in types and "upload" in types:
+            return ("download", "upload")
+        elif "ping" in types and "download" in types:
+            return ("ping", "download")
+        elif "ping" in types and "upload" in types:
+            return ("ping", "upload")
+        else:
+            raise ValueError("Invalid data type combination.")
+    
