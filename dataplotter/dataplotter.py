@@ -11,6 +11,17 @@ class DataPlotter:
     """Class to handle plotting of speed test data."""
     
     def __init__(self, data: list[SpeedTestResult]) -> None:
+        """Initializes the DataPlotter with the provided data.
+        Args: 
+            data (list[SpeedTestResult]): A list of SpeedTestResult 
+            instances.
+        Raises:
+            ValueError: If the data is not a list of SpeedTestResult 
+            instances.
+        """
+        if not all(isinstance(item, SpeedTestResult) for item in data):
+            raise ValueError("Data must be a list of SpeedTestResult "
+                             "instances.")
         self.data = data
     
     def plot_data(self, data_types: tuple[str, str]) -> None:
