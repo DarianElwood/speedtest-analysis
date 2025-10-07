@@ -4,11 +4,28 @@ import pandas as pd
 
 class DataProcessor:
     def __init__(self):
+        """Initialize the DataProcessor and load data.
+         This method loads speed test results and coordinates from
+         predefined files and merges them into Location objects.
+         The merged data is stored in self.locations as a list of 
+         Location instances.
+         
+            Args:
+                None
+            Raises:
+                None
+         """
+         
         self.locations: List[Location] = []
         self.load_into_locations()
     
     def load_into_locations(self, excel="speeds.xlsx", csv="coords.csv") -> None:
-        """Load and join speed test results with coordinates."""
+        """Load and join speed test results with coordinates.
+        Raises:
+            FileNotFoundError: If the specified files do not exist.
+        Returns:
+            None
+        """
         speeds_df = pd.read_excel(excel)
         coords_df = pd.read_csv(csv)
         
@@ -28,9 +45,23 @@ class DataProcessor:
             
     def load_from_csv(self, filepath: str) -> None:
         """Load locations directly from a CSV file with columns:
-        name,lat,long,upload,download
+        name,lat,long,upload,download.
+        Args:
+            filepath (str): Path to the CSV file.
+        Raises:
+            FileNotFoundError: If the specified file does not exist.
+            ValueError: If required columns are missing.
         """
-        df = pd.read_csv(filepath)
+        try:
+            df = pd.read_csv(filepath)
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"File not found: {filepath}") from e
+        
+        required_columns = {'name', 'lat', 'long', 'upload', 'download'}
+
+        if not required_columns.issubset(df.columns):
+                raise ValueError(f"CSV file must contain columns: {required_columns}")
+        
         for index, row in df.iterrows():
             loc = Location(
                 latitude=row['lat'],
