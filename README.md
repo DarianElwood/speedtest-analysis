@@ -9,7 +9,7 @@ There is only one main feature of this project: plotting speedtest results. Usin
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/darianelwood/speedtestplot.git
+   git clone https://github.com/darianelwood/speedtest-analysis.git
     ```
 2. Navigate to the project directory:
    ```bash
