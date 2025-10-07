@@ -101,3 +101,18 @@ class KNearestNeighbours:
             'download_rmse_std': download_scores.std()
         }
 
+    def predict(self, lat_rad: float, lon_rad: float) -> Tuple[float, float]:
+        """Predict upload and download speeds at the given latitude and longitude.
+        
+        Args:
+            lat_rad (float): Latitude in radians.
+            lon_rad (float): Longitude in radians.
+        """
+        
+        if self.use_haversine and not self.assume_radians:
+            lat_rad = radians(lat_rad)
+            lon_rad = radians(lon_rad)
+        query_point = np.array([[lat_rad, lon_rad]])
+        pred_upload = self.upload_model.predict(query_point)[0]
+        pred_download = self.download_model.predict(query_point)[0]
+        return pred_upload, pred_download

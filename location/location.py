@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 class Location():
     def __init__(self, latitude: float, longitude: float, name: str,
-                 upload: float, download: float, ping: float):
+                 upload: float, download: float) -> None:
         """Location class constructor.
         Args:
             latitude (float): Latitude in radians.
@@ -19,10 +19,7 @@ class Location():
         self.longitude = longitude
         self.upload = upload
         self.download = download
-        self.ping = ping
         
-        if not isinstance(ping, (int, float)):
-            raise TypeError("Ping must be a numeric type.")
         
         if not isinstance(download, (int, float)):
             raise TypeError("Download speed must be a numeric type.")

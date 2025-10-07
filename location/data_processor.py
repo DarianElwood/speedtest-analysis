@@ -21,9 +21,23 @@ class DataProcessor:
                 latitude=row['Latitude (radians)'],
                 longitude=row['Longitude (radians)'],
                 name=row['Server'],
-                ping=row['Ping'],
                 download=row['Download'],
                 upload=row['Upload']
+            )
+            self.locations.append(loc)
+            
+    def load_from_csv(self, filepath: str) -> None:
+        """Load locations directly from a CSV file with columns:
+        name,lat,long,upload,download
+        """
+        df = pd.read_csv(filepath)
+        for index, row in df.iterrows():
+            loc = Location(
+                latitude=row['lat'],
+                longitude=row['long'],
+                name=row['name'],
+                upload=row['upload'],
+                download=row['download']
             )
             self.locations.append(loc)
             
