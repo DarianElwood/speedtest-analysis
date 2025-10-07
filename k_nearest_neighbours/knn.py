@@ -1,11 +1,10 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, mean_absolute_error
 from typing import List, Tuple
-from math import radians, sin, cos, sqrt, atan2
+from math import radians
 from location.location import Location
-from sklearn.model_selection import cross_val_score
+
 
 
 class KNearestNeighbours:
@@ -24,17 +23,13 @@ class KNearestNeighbours:
         self.y_upload_test = None
         self.y_download_train = None
         self.y_download_test = None
-        self.y_ping_train = None
-        self.y_ping_test = None
         
         self.model = self._train_model()
-        print(self.evaluate_models())
     
-    def _train_model(self) -> tuple[KNeighborsRegressor, KNeighborsRegressor, KNeighborsRegressor]:
+    def _train_model(self) -> tuple[KNeighborsRegressor, KNeighborsRegressor]:
         coords = np.array([[loc.latitude, loc.longitude] for loc in self.locations])
         uploads = np.array([loc.upload for loc in self.locations])
         downloads = np.array([loc.download for loc in self.locations])
-        pings = np.array([loc.ping for loc in self.locations])
 
         if self.use_haversine:
             metric = 'haversine'
@@ -44,22 +39,20 @@ class KNearestNeighbours:
             metric = 'euclidean'
 
         # Train/test split
-        self.X_train, self.X_test, self.y_upload_train, self.y_upload_test, self.y_download_train, self.y_download_test, self.y_ping_train, self.y_ping_test = train_test_split(
-            coords, uploads, downloads, pings, 
+        self.X_train, self.X_test, self.y_upload_train, self.y_upload_test, self.y_download_train, self.y_download_test = train_test_split(
+            coords, uploads, downloads, 
             test_size=self.test_size, 
             random_state=self.random_state
         )
 
-        # Train separate models for upload, download, and ping on training data only
+        # Train separate models for upload and download on training data only
         self.upload_model = KNeighborsRegressor(n_neighbors=self.n_neighbors, metric=metric, weights='distance')
         self.download_model = KNeighborsRegressor(n_neighbors=self.n_neighbors, metric=metric, weights='distance')
-        self.ping_model = KNeighborsRegressor(n_neighbors=self.n_neighbors, metric=metric, weights='distance')
 
         self.upload_model.fit(self.X_train, self.y_upload_train)
         self.download_model.fit(self.X_train, self.y_download_train)
-        self.ping_model.fit(self.X_train, self.y_ping_train)
 
-        return (self.upload_model, self.download_model, self.ping_model)
+        return (self.upload_model, self.download_model)
     
     def find_nearest(self, lat_rad: float, lon_rad: float) -> List[Tuple[Location, float]]:
         """Find the nearest locations to the given latitude and longitude.
@@ -90,7 +83,6 @@ class KNearestNeighbours:
         coords = np.array([[loc.latitude, loc.longitude] for loc in self.locations])
         uploads = np.array([loc.upload for loc in self.locations])
         downloads = np.array([loc.download for loc in self.locations])
-        pings = np.array([loc.ping for loc in self.locations])
         
         if self.use_haversine and not self.assume_radians:
             coords = np.radians(coords)
@@ -100,16 +92,12 @@ class KNearestNeighbours:
                                        cv=5, scoring='neg_root_mean_squared_error')
         download_scores = cross_val_score(self.download_model, coords, downloads, 
                                          cv=5, scoring='neg_root_mean_squared_error')
-        ping_scores = cross_val_score(self.ping_model, coords, pings, 
-                                     cv=5, scoring='neg_root_mean_squared_error')
         
         return {
             'n_samples': len(self.locations),
             'upload_rmse': -upload_scores.mean(),
-            'download_rmse': -download_scores.mean(), 
-            'ping_rmse': -ping_scores.mean(),
+            'download_rmse': -download_scores.mean(),
             'upload_rmse_std': upload_scores.std(),
-            'download_rmse_std': download_scores.std(),
-            'ping_rmse_std': ping_scores.std()
+            'download_rmse_std': download_scores.std()
         }
 
