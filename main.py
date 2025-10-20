@@ -3,8 +3,6 @@ from dataplotter import DataPlotter
 from speedtest_result import SpeedTestResult
 import sys
 
-
-
 def main() -> None:
     """Main function to read data and plot based upon command-line 
     arguments."""
